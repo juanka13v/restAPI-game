@@ -5,6 +5,7 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Please provide a name"],
     trim: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -15,6 +16,7 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Please provide a email"],
     trim: true,
+    unique: true,
   },
   games: [
     {

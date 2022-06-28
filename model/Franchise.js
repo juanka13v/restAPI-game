@@ -6,6 +6,7 @@ const franchiseSchema = new Schema({
     required: [true, "Please provide a franchise game"],
     trim: true,
     lowercase: true,
+    unique: true
   },
   description: {
     type: String,

@@ -1,40 +1,45 @@
+const CustomError = require('../errors')
 const User = require("../model/User");
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const user = await User.findById(id);
 
-    res.status(200).json({ user });
-  } catch (error) {
-    res.status(400).json({ error });
+    if(!user) {
+      throw new CustomError.NotFoundError(`No user with id : ${id}`) 
+    }
+
+    res.status(200).json({ success:true, user });
+  } catch (err) {
+    next(err)
   }
 };
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find();
 
-    res.status(200).json({ users });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(200).json({ success:true, users });
+  } catch (err) {
+    next(err)
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   const newUser = new User(req.body);
 
   try {
     const userSaved = await newUser.save();
 
-    res.status(200).json({ userSaved });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(200).json({ success:true, userSaved });
+  } catch (err) {
+    next(err)
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   const id = req.params.id;
 
   try {
@@ -42,21 +47,29 @@ const updateUser = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json({ userUpdated });
-  } catch (error) {
-    res.status(400).json({ error });
+    if(!userUpdated) {
+      throw new CustomError.NotFoundError(`No user with id : ${id}`)
+    }
+
+    res.status(200).json({ success:true, userUpdated });
+  } catch (err) {
+    next(err)
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const userDeleted = await User.findByIdAndDelete(id);
 
-    res.status(200).json({ msg: "Deleted" });
-  } catch (error) {
-    res.status(400).json({ error });
+    if(!userDeleted) {
+      throw new CustomError.NotFoundError(`No user with id : ${id}`)
+    }
+
+    res.status(200).json({ success:true, msg: "Deleted" });
+  } catch (err) {
+    next(err)
   }
 };
 

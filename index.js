@@ -7,6 +7,8 @@ const categoryRoute = require("./routes/category.route");
 const companyRoute = require("./routes/company.route");
 const franchiseRoute = require("./routes/franchise.route");
 const userRoute = require("./routes/user.route");
+const errorHandlerMiddleware = require("./middlewares/handleErrors");
+
 
 // connect to MongoDB
 const connectDB = require("./db/connect");
@@ -21,6 +23,8 @@ app.use("/api/v1", categoryRoute);
 app.use("/api/v1", companyRoute);
 app.use("/api/v1", franchiseRoute);
 app.use("/api/v1", userRoute);
+
+app.use(errorHandlerMiddleware);
 
 app.get("/", (req, res) => {
   res.send("hOLA MUNDO");

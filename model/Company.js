@@ -5,6 +5,7 @@ const companySchema = new Schema({
     type: String,
     required: [true, "Please provide a company name"],
     trim: true,
+    unique: true
   },
   description: {
     type: String,

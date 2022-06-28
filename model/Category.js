@@ -5,6 +5,7 @@ const categorySchema = new Schema({
     type: String,
     required: [true, "Please provide a category"],
     trim: true,
+    unique: true
   },
   description: {
     type: String,

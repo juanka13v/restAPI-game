@@ -1,40 +1,45 @@
+const CustomError = require("../errors");
 const Category = require("../model/Category");
 
-const getCategory = async (req, res) => {
+const getCategory = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const category = await Category.findById(id);
 
-    res.status(200).json({ category });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!category) {
+      throw new CustomError.NotFoundError(`No category with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, category });
+  } catch (err) {
+    next(err);
   }
 };
 
-const getAllCategories = async (req, res) => {
+const getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.find();
 
-    res.status(200).json({ categories });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(200).json({ success: true, categories });
+  } catch (err) {
+    next(err);
   }
 };
 
-const createCategory = async (req, res) => {
+const createCategory = async (req, res, next) => {
   const newCategory = new Category(req.body);
 
   try {
     const categorySaved = await newCategory.save();
 
-    res.status(200).json({ categorySaved });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(201).json({ success: true, categorySaved });
+  } catch (err) {
+    next(err);
   }
 };
 
-const updateCategory = async (req, res) => {
+const updateCategory = async (req, res, next) => {
   const id = req.params.id;
 
   try {
@@ -42,21 +47,29 @@ const updateCategory = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json({ categoryUpdate });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!categoryUpdate) {
+      throw new CustomError.NotFoundError(`No category with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, categoryUpdate });
+  } catch (err) {
+    next(err);
   }
 };
 
-const deleteCategory = async (req, res) => {
+const deleteCategory = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const categoryDeleted = await Category.findByIdAndDelete(id);
 
-    res.status(200).json({ msg: "Deleted" });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!categoryDeleted) {
+      throw new CustomError.NotFoundError(`No category with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, msg: "Deleted" });
+  } catch (err) {
+    next(err);
   }
 };
 

@@ -4,7 +4,7 @@ const gameSchema = new Schema({
   title: {
     type: String,
     unique: true,
-    required: [true, "Please provide a realease date"],
+    required: [true, "Please provide a title name"],
   },
   thumbnail: {
     type: String,

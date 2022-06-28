@@ -1,40 +1,45 @@
+const CustomError = require("../errors");
 const Franchise = require("../model/Franchise");
 
-const getFranchise = async (req, res) => {
+const getFranchise = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const franchise = await Franchise.findById(id);
 
-    res.status(200).json({ franchise });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!franchise) {
+      throw new CustomError.NotFoundError(`No Franchise with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, franchise });
+  } catch (err) {
+    next(err);
   }
 };
 
-const getAllFranchises = async (req, res) => {
+const getAllFranchises = async (req, res, next) => {
   try {
     const franchises = await Franchise.find();
 
-    res.status(200).json({ franchises });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(200).json({ success: true, franchises });
+  } catch (err) {
+    next(err);
   }
 };
 
-const createFranchise = async (req, res) => {
+const createFranchise = async (req, res, next) => {
   const newFranchise = new Franchise(req.body);
 
   try {
     const franchiseSaved = await newFranchise.save();
 
-    res.status(201).json({ franchiseSaved });
-  } catch (error) {
-    res.status(400).json({ error });
+    res.status(201).json({ success: true, franchiseSaved });
+  } catch (err) {
+    next(err);
   }
 };
 
-const updateFranchise = async (req, res) => {
+const updateFranchise = async (req, res, next) => {
   const id = req.params.id;
 
   try {
@@ -42,21 +47,29 @@ const updateFranchise = async (req, res) => {
       new: true,
     });
 
-    res.status(200).json({ franchiseUpdate });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!franchiseUpdate) {
+      throw new CustomError.NotFoundError(`No franchise with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, franchiseUpdate });
+  } catch (err) {
+    next(err);
   }
 };
 
-const deleteFrenchise = async (req, res) => {
+const deleteFrenchise = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     const franchiseDeleted = await Franchise.findByIdAndDelete(id);
 
-    res.status(200).json({ msg: "Deleted" });
-  } catch (error) {
-    res.status(400).json({ error });
+    if (!franchiseDeleted) {
+      throw new CustomError.NotFoundError(`No franchise with id : ${id}`);
+    }
+
+    res.status(200).json({ success: true, msg: "Deleted" });
+  } catch (err) {
+    next(err);
   }
 };
 
