@@ -11,9 +11,9 @@ const companySchema = new Schema({
     type: String,
     required: [true, "Please provide a description"],
   },
-  header: {
-    type: String,
-    required: [true, "Please provide a header"],
+  thumbnail: {
+    url: {type: String, required: "Please provide a url"},
+    img_id: {type: String, required: "Please provide a img_id"}
   },
   foundation: {
     date: { type: Date, required: [true, "Please provide a Date"] },

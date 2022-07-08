@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const fileUpload = require("express-fileupload");
 const router = Router();
 const {
   createFranchise,
@@ -8,11 +9,19 @@ const {
   updateFranchise,
 } = require("../controllers/franchise.controller");
 
-router.route("/franchises").get(getAllFranchises).post(createFranchise);
-router
-  .route("/franchise/:id")
-  .get(getFranchise)
-  .put(updateFranchise)
-  .delete(deleteFrenchise);
+router.route("/franchises").get(getAllFranchises);
+
+router.post(
+  "/franchises",
+  fileUpload({ useTempFiles: true, tempFileDir: "./uploads" }),
+  createFranchise
+);
+router.put(
+  "/franchise/:id",
+  fileUpload({ useTempFiles: true, tempFileDir: "./uploads" }),
+  updateFranchise
+);
+
+router.route("/franchise/:id").get(getFranchise).delete(deleteFrenchise);
 
 module.exports = router;

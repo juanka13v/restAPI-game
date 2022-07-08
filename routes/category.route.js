@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const router = Router();
+const fileUpload = require('express-fileupload')
 const {
   createCategory,
   deleteCategory,
@@ -8,11 +9,22 @@ const {
   updateCategory,
 } = require("../controllers/category.controller");
 
-router.route("/categories").get(getAllCategories).post(createCategory);
+router.route("/categories").get(getAllCategories);
+
+router.post(
+  "/categories",
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "./uploads",
+  }),
+  createCategory
+);
+
+router.put('/category/:id', fileUpload({useTempFiles: true, tempFileDir: './uploads'}), updateCategory)
+
 router
   .route("/category/:id")
   .get(getCategory)
-  .put(updateCategory)
   .delete(deleteCategory);
 
 module.exports = router;

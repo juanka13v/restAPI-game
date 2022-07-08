@@ -6,7 +6,7 @@ const franchiseSchema = new Schema({
     required: [true, "Please provide a franchise game"],
     trim: true,
     lowercase: true,
-    unique: true
+    unique: true,
   },
   description: {
     type: String,
@@ -18,15 +18,12 @@ const franchiseSchema = new Schema({
       ref: "Game",
     },
   ],
-  screenshots: [
-    {
+  thumbnail: {
+    url: { type: String, required: [true, "Please provide a url thumbnail"] },
+    img_id: {
       type: String,
-      required: [true, "Please provide one or more screenshots"],
+      required: [true, "Please provide a img_id thumbnail"],
     },
-  ],
-  header: {
-    type: String,
-    required: [true, "Please provide a header"],
   },
 });
 

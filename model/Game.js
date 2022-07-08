@@ -7,8 +7,8 @@ const gameSchema = new Schema({
     required: [true, "Please provide a title name"],
   },
   thumbnail: {
-    type: String,
-    required: [true, "Please provide a thumbnail"],
+    url: { type: String, required: [true, "Please provide a url"] },
+    img_id: { type: String, required: [true, "Please provide a img id"] },
   },
   description: {
     type: String,
@@ -52,8 +52,14 @@ const gameSchema = new Schema({
   },
   screenshots: [
     {
-      type: String,
-      required: [true, "Please provide one o more screenshots"],
+      screenshot_url: {
+        type: String,
+        required: [true, "Please provide one o more screenshot_url"],
+      },
+      screenshot_id: {
+        type: String,
+        required: [true, "Please provide one o more screenshot_id"],
+      },
     },
   ],
 });

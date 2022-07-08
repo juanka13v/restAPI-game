@@ -1,5 +1,8 @@
 const CustomError = require("../errors");
 const Franchise = require("../model/Franchise");
+const { uploadImage, deleteImage } = require("../utils/cloudinary");
+const getInfo = require("../utils/info");
+const fs = require("fs-extra");
 
 const getFranchise = async (req, res, next) => {
   const id = req.params.id;
@@ -19,18 +22,32 @@ const getFranchise = async (req, res, next) => {
 
 const getAllFranchises = async (req, res, next) => {
   try {
-    const franchises = await Franchise.find();
+    const count = await Franchise.count();
+    const info = getInfo(count, req);
 
-    res.status(200).json({ success: true, franchises });
+    const franchises = await Franchise.find()
+      .limit(info.limit)
+      .skip((info.page - 1) * info.limit);
+
+    res.status(200).json({ success: true, info, franchises });
   } catch (err) {
     next(err);
   }
 };
 
 const createFranchise = async (req, res, next) => {
-  const newFranchise = new Franchise(req.body);
+  if (!req.files?.thumbnail) {
+    throw new CustomError.BadRequestError("No ile thumbnail upload");
+  }
 
   try {
+    const thumbnail = await uploadImage(req.files.thumbnail.tempFilePath);
+    await fs.unlink(req.files.thumbnail.tempFilePath);
+
+    const newFranchise = new Franchise({
+      ...req.body,
+      thumbnail: { url: thumbnail.secure_url, img_id: thumbnail.public_id },
+    });
     const franchiseSaved = await newFranchise.save();
 
     res.status(201).json({ success: true, franchiseSaved });
@@ -41,9 +58,22 @@ const createFranchise = async (req, res, next) => {
 
 const updateFranchise = async (req, res, next) => {
   const id = req.params.id;
+  const update = req.body;
 
   try {
-    const franchiseUpdate = await Franchise.findByIdAndUpdate(id, req.body, {
+    if (req.files.thumbnail) {
+      const thumbnail = await uploadImage(req.files.thumbnail.tempFilePath);
+      await fs.unlink(req.files.thumbnail.tempFilePath);
+      const franchise = await Franchise.findById(id);
+      await deleteImage(franchise.thumbnail.img_id);
+
+      update.thumbnail = {
+        url: thumbnail.secure_url,
+        img_id: thumbnail.public_id,
+      };
+    }
+
+    const franchiseUpdate = await Franchise.findByIdAndUpdate(id, update, {
       new: true,
     });
 
@@ -61,11 +91,14 @@ const deleteFrenchise = async (req, res, next) => {
   const id = req.params.id;
 
   try {
-    const franchiseDeleted = await Franchise.findByIdAndDelete(id);
+    const franchise = await Franchise.findById(id);
 
-    if (!franchiseDeleted) {
+    if (!franchise) {
       throw new CustomError.NotFoundError(`No franchise with id : ${id}`);
     }
+
+    await deleteImage(franchise.thumbnail.img_id);
+    await franchise.remove();
 
     res.status(200).json({ success: true, msg: "Deleted" });
   } catch (err) {

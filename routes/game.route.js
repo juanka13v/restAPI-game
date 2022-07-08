@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const fileUpload = require("express-fileupload");
 const router = Router();
+const verifyAdminRole = require("../middlewares/authJwt");
+const verifySingUp = require("../middlewares/verifySingUp");
 const {
   createGame,
   deleteGame,
@@ -9,15 +11,29 @@ const {
   updateGame,
 } = require("../controllers/game.controller");
 
-router.route("/games").get(getAllGames);
+router.get("/games", verifySingUp, getAllGames);
+
 router.post(
   "/games",
   fileUpload({
     useTempFiles: true,
     tempFileDir: "./uploads",
   }),
+  verifyAdminRole,
   createGame
 );
-router.route("/game/:id").get(getGame).put(updateGame).delete(deleteGame);
+router.put(
+  "/game/:id",
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "./uploads",
+  }),
+  verifyAdminRole,
+  updateGame
+);
+
+router.delete("/game/:id", verifyAdminRole, deleteGame);
+
+router.route("/game/:id").get(getGame);
 
 module.exports = router;
